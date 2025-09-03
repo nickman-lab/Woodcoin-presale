@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>WOOD Presale</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' rx='12' fill='%237a54ff'/%3E%3Cpath d='M12 18h40v28H12z' fill='%23ffcc4d'/%3E%3C/svg%3E"/>
+<style>
+:root{
+  --bg:#0e1116;--panel:#131823;--muted:#8ea1b2;--text:#e5edf3;--primary:#7a54ff;--accent:#22c55e;--danger:#ef4444;--warning:#f59e0b;
+}
+*{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.container{max-width:980px;margin:24px auto;padding:0 16px}
+.card{background:var(--panel);border:1px solid #1d2432;border-radius:16px;padding:20px;box-shadow:0 8px 30px rgb(0 0 0 / 25%)}
+.hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:34px;display:flex;align-items:center;gap:10px}
+.badge{background:#1b2332;border:1px solid #2a3548;color:var(--muted);padding:6px 10px;border-radius:10px;font-size:14px}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.btn{background:#1b2030;border:1px solid #2b3346;color:#e5edf3;padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer}
+.btn:hover{background:#222a3a}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:white}
+.btn.danger{background:#2a1b1b;border-color:#432020;color:#ffc9c9}
+.kpi{display:flex;gap:10px;align-items:center;padding:8px 12px;border:1px solid #273149;border-radius:12px;background:#121826}
+.kpi .label{color:var(--muted);font-size:13px}
+.kpi .val{font-weight:700}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.section-title{font-weight:700;margin:10px 0 8px;color:#c7d2e1;font-size:18px}
+.info{border:1px dashed #263149;border-radius:12px;padding:14px}
+.info .rowi{display:flex;gap:10px;align-items:center;margin:6px 0}
+.progress{height:10px;background:#0f1421;border:1px solid #202a3d;border-radius:8px;overflow:hidden}
+.progress>span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#8bde86)}
+.small{font-size:13px;color:var(--muted)}
+input[type=number],input[type=text]{width:100%;background:#0f1421;border:1px solid #283248;color:#dfe7ef;border-radius:12px;padding:12px}
+.form-row{display:flex;gap:10px}
+.form-row>*{flex:1}
+.status-dot{width:10px;height:10px;border-radius:50%}
+.dot-green{background:#16a34a}.dot-yellow{background:#f59e0b}.dot-red{background:#ef4444}
+.copy{cursor:pointer;color:#8ea1b2}
+.copy:hover{color:#c7d2e1;text-decoration:underline}
+hr{border:0;border-top:1px solid #263149;margin:20px 0}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="hdr">
+      <h1>🔥 WOOD Presale</h1>
+      <div class="badge">BNB Smart Chain (56)</div>
+    </div>
+    <div class="row">
+      <button id="btnConnect" class="btn primary">Connect Wallet</button>
+      <button id="btnDisconnect" class="btn danger" style="display:none">Disconnect</button>
+      <button id="btnAddToken" class="btn">+ Add WOOD to MetaMask</button>
+    </div>
+    <div class="row">
+      <div class="kpi"><span class="label">Status:</span><span id="status" class="val">–</span></div>
+      <div class="kpi"><span class="label">Opens in:</span><span id="opensIn" class="val">–</span></div>
+      <div class="kpi"><span class="label">Ends in:</span><span id="endsIn" class="val">–</span></div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="section-title">Buy WOOD</div>
+        <div class="form-row">
+          <div>
+            <label class="small">Amount (BNB)</label>
+            <input type="number" id="bnbAmount" placeholder="0.01" min="0" step="0.001"/>
+          </div>
+          <div>
+            <label class="small">You get (WOOD)</label>
+            <input type="text" id="woodPreview" placeholder="0" readonly/>
+          </div>
+        </div>
+        <div class="row">
+          <button id="btnBuy" class="btn primary">Buy</button>
+          <button id="btnClaim" class="btn">Claim</button>
+        </div>
+        <div class="small" id="txMsg"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Information</div>
+        <div class="info">
+          <div class="rowi"><span class="small">Sale Contract:</span>
+            <span id="saleAddr" class="copy"></span>
+          </div>
+          <div class="rowi"><span class="small">Token (WOOD):</span>
+            <span id="tokenAddr" class="copy"></span>
+          </div>
+          <div class="rowi"><span class="small">Rate:</span>
+            <span id="rateTxt" class="val">–</span><span class="small">&nbsp;WOOD / 1 BNB</span>
+          </div>
+          <div class="rowi"><span class="small">Raised:</span>
+            <span id="raisedTxt" class="val">–</span><span class="small">&nbsp;/ 100 BNB</span>
+          </div>
+          <div class="progress"><span id="bar" style="width:0%"></span></div>
+          <div class="rowi"><span class="small">Your allocation (unclaimed):</span>
+            <span id="unclaimed" class="val">– WOOD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+<script>
+// Config + logic la fel ca în varianta explicată anterior
+</script>
+</body>
+</html>
