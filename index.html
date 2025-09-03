@@ -379,6 +379,101 @@ if (storedTime && parseInt(storedTime) > Date.now()) {
     </div>
   </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script>
+const SALE_ADDRESS = "0x7cebc99b114138152D54589BaF6a386b5435f4d0";
+const TOKEN_ADDRESS = "0x5c96991B2EB50924348eCcf3bBB97cDc0a83466E";
+const ABI = [{
+  "inputs": [{"internalType":"address","name":"beneficiary","type":"address"}],
+  "name":"buyTokens",
+  "outputs":[],
+  "stateMutability":"payable",
+  "type":"function"
+}];
+
+let userAddress = null;
+
+async function connectWallet() {
+  if (!window.ethereum) {
+    alert("MetaMask not detected!");
+    return;
+  }
+
+  const chainId = await ethereum.request({ method: 'eth_chainId' });
+  if (chainId !== '0x38') {
+    try {
+      await ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x38' }]
+      });
+    } catch (switchErr) {
+      await ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x38',
+          chainName: 'Binance Smart Chain',
+          rpcUrls: ['https://bsc-dataseed.binance.org/'],
+          nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+          blockExplorerUrls: ['https://bscscan.com']
+        }]
+      });
+    }
+  }
+
+  const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+  userAddress = accounts[0];
+  document.getElementById('walletAddress').innerText = 'Wallet: ' + userAddress;
+}
+
+async function addToken() {
+  if (!window.ethereum) return;
+  try {
+    await ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: TOKEN_ADDRESS,
+          symbol: 'WOOD',
+          decimals: 18,
+        },
+      },
+    });
+  } catch (err) {
+    console.error('Add token error:', err);
+  }
+}
+
+async function buyTokens() {
+  if (!userAddress) {
+    alert("Connect your wallet first!");
+    return;
+  }
+
+  const amount = prompt("Enter amount of BNB to spend:");
+  if (!amount || isNaN(amount)) return;
+
+  const web3 = new Web3(window.ethereum);
+  const contract = new web3.eth.Contract(ABI, SALE_ADDRESS);
+  const value = web3.utils.toWei(amount, 'ether');
+
+  contract.methods.buyTokens(userAddress).send({
+    from: userAddress,
+    value
+  })
+  .on("transactionHash", function(hash){
+    alert("Transaction sent: " + hash);
+  })
+  .on("receipt", function(receipt){
+    alert("✅ Transaction confirmed!");
+  })
+  .on("error", function(err){
+    alert("❌ Transaction failed");
+  });
+}
+</script>
+
 </body>
 
 </html>
