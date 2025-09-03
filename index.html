@@ -1,109 +1,384 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>WOOD Presale</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' rx='12' fill='%237a54ff'/%3E%3Cpath d='M12 18h40v28H12z' fill='%23ffcc4d'/%3E%3C/svg%3E"/>
-<style>
-:root{
-  --bg:#0e1116;--panel:#131823;--muted:#8ea1b2;--text:#e5edf3;--primary:#7a54ff;--accent:#22c55e;--danger:#ef4444;--warning:#f59e0b;
-}
-*{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-.container{max-width:980px;margin:24px auto;padding:0 16px}
-.card{background:var(--panel);border:1px solid #1d2432;border-radius:16px;padding:20px;box-shadow:0 8px 30px rgb(0 0 0 / 25%)}
-.hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-h1{margin:0;font-size:34px;display:flex;align-items:center;gap:10px}
-.badge{background:#1b2332;border:1px solid #2a3548;color:var(--muted);padding:6px 10px;border-radius:10px;font-size:14px}
-.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
-.btn{background:#1b2030;border:1px solid #2b3346;color:#e5edf3;padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer}
-.btn:hover{background:#222a3a}
-.btn.primary{background:var(--primary);border-color:var(--primary);color:white}
-.btn.danger{background:#2a1b1b;border-color:#432020;color:#ffc9c9}
-.kpi{display:flex;gap:10px;align-items:center;padding:8px 12px;border:1px solid #273149;border-radius:12px;background:#121826}
-.kpi .label{color:var(--muted);font-size:13px}
-.kpi .val{font-weight:700}
-.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin-top:16px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-.section-title{font-weight:700;margin:10px 0 8px;color:#c7d2e1;font-size:18px}
-.info{border:1px dashed #263149;border-radius:12px;padding:14px}
-.info .rowi{display:flex;gap:10px;align-items:center;margin:6px 0}
-.progress{height:10px;background:#0f1421;border:1px solid #202a3d;border-radius:8px;overflow:hidden}
-.progress>span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#8bde86)}
-.small{font-size:13px;color:var(--muted)}
-input[type=number],input[type=text]{width:100%;background:#0f1421;border:1px solid #283248;color:#dfe7ef;border-radius:12px;padding:12px}
-.form-row{display:flex;gap:10px}
-.form-row>*{flex:1}
-.status-dot{width:10px;height:10px;border-radius:50%}
-.dot-green{background:#16a34a}.dot-yellow{background:#f59e0b}.dot-red{background:#ef4444}
-.copy{cursor:pointer;color:#8ea1b2}
-.copy:hover{color:#c7d2e1;text-decoration:underline}
-hr{border:0;border-top:1px solid #263149;margin:20px 0}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WOODCOIN Pre-Sale</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    body {
+      background: #000;
+      color: #f1c40f;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 15px 25px;
+      background: #2980b9;
+      color: #fff;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .wallet-status, .warning, .timer, .message {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    .progress-container {
+      margin-top: 30px;
+      width: 80%;
+      background-color: #333;
+      border-radius: 10px;
+      margin-left: auto;
+      margin-right: auto;
+      height: 25px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: #27ae60;
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .note {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #ccc;
+    }
+    a {
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <div class="card">
-    <div class="hdr">
-      <h1>🔥 WOOD Presale</h1>
-      <div class="badge">BNB Smart Chain (56)</div>
+  <h1>🔥 WOODCOIN Pre-Sale</h1>
+  <p style="margin-top: 10px; color: #ffd700; font-size: 16px;">
+    WOODCOIN is a Play-to-Earn token that fuels the WOOD ecosystem.<br>
+    Earn it. Use it. Burn it. 🔥
+  </p>
+
+  <h2>Buy now: 50,000 WOOD per 1 BNB</h2>
+
+  
+    <div class="timer" id="countdown">⏳ Loading timer...</div>
+    
+        
+<div id="woodInfo" style="margin-top: 5px; font-size: 14px; color: #ccc;">
+  🪙 WOOD Distributed: -- WOOD<br>
+  💵 1 WOOD = $0.005
+</div>
+
+    <div id="bnbValue" style="margin-top: 5px; font-size: 14px; color: #ccc;">≈ -- USD raised</div>
+        <div id="bnbPrice"
+         style="margin-top: 10px; font-size: 15px; color: #fff;">BNB Price: $--</div>
+    <script>
+      async function getBNBPrice() {
+        try {
+          const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd");
+          const data = await res.json();
+          const price = data.binancecoin.usd;
+          
+        
+document.getElementById("bnbPrice").innerText = "BNB Price: $" + price.toFixed(2);
+
+try {
+  const raisedText = document.getElementById("bnbRaisedText")?.innerText;
+  const match = raisedText?.match(/\d+(\.\d+)?/);
+  if (match && match[0]) {
+    const raisedBNB = parseFloat(match[0]);
+    const usdValue = (raisedBNB * price).toFixed(2);
+    document.getElementById("bnbValue").innerText = "≈ $" + usdValue + " raised";
+  } else {
+    
+try {
+  const raisedText = document.getElementById("bnbRaisedText")?.innerText;
+  const match = raisedText?.match(/\d+(\.\d+)?/);
+  if (match && match[0]) {
+    const raisedBNB = parseFloat(match[0]);
+    const usdValue = (raisedBNB * price).toFixed(2);
+    document.getElementById("bnbValue").innerText = "≈ $" + usdValue + " raised";
+
+    // Calcul WOOD distribuit (1 WOOD = 0.005 USD)
+    const woodAmount = Math.floor(usdValue / 0.005);
+    document.getElementById("woodInfo").innerHTML = `
+      🪙 WOOD Distributed: ${woodAmount.toLocaleString()} WOOD<br>
+      💵 1 WOOD = $0.005
+    `;
+  } else {
+    document.getElementById("bnbValue").innerText = "≈ $-- raised";
+  }
+} catch (e) {
+  document.getElementById("bnbValue").innerText = "≈ $-- raised";
+}
+
+  }
+} catch (e) {
+  
+try {
+  const raisedText = document.getElementById("bnbRaisedText")?.innerText;
+  const match = raisedText?.match(/\d+(\.\d+)?/);
+  if (match && match[0]) {
+    const raisedBNB = parseFloat(match[0]);
+    const usdValue = (raisedBNB * price).toFixed(2);
+    document.getElementById("bnbValue").innerText = "≈ $" + usdValue + " raised";
+
+    // Calcul WOOD distribuit (1 WOOD = 0.005 USD)
+    const woodAmount = Math.floor(usdValue / 0.005);
+    document.getElementById("woodInfo").innerHTML = `
+      🪙 WOOD Distributed: ${woodAmount.toLocaleString()} WOOD<br>
+      💵 1 WOOD = $0.005
+    `;
+  } else {
+    document.getElementById("bnbValue").innerText = "≈ $-- raised";
+  }
+} catch (e) {
+  document.getElementById("bnbValue").innerText = "≈ $-- raised";
+}
+
+}
+
+        try {
+          const raisedText = document.getElementById("bnbRaisedText").innerText;
+          const raisedBNB = parseFloat(raisedText.split(":")[1]);
+          const usdValue = (raisedBNB * price).toFixed(2);
+          document.getElementById("bnbValue").innerText = "≈ $" + usdValue + " raised";
+        } catch (e) {
+          
+try {
+  const raisedText = document.getElementById("bnbRaisedText")?.innerText;
+  const match = raisedText?.match(/\d+(\.\d+)?/);
+  if (match && match[0]) {
+    const raisedBNB = parseFloat(match[0]);
+    const usdValue = (raisedBNB * price).toFixed(2);
+    document.getElementById("bnbValue").innerText = "≈ $" + usdValue + " raised";
+
+    // Calcul WOOD distribuit (1 WOOD = 0.005 USD)
+    const woodAmount = Math.floor(usdValue / 0.005);
+    document.getElementById("woodInfo").innerHTML = `
+      🪙 WOOD Distributed: ${woodAmount.toLocaleString()} WOOD<br>
+      💵 1 WOOD = $0.005
+    `;
+  } else {
+    document.getElementById("bnbValue").innerText = "≈ $-- raised";
+  }
+} catch (e) {
+  document.getElementById("bnbValue").innerText = "≈ $-- raised";
+}
+
+        }
+        
+        } catch (err) {
+          console.error("CoinGecko API error:", err);
+        }
+      }
+      getBNBPrice();
+      setInterval(getBNBPrice, 30000); // actualizează la 30 secunde
+    </script>
+    
+
+  <div class="wallet-status" id="walletAddress">Wallet: Not connected</div>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <br/>
+  <button onclick="addToken()">Add WOODCOIN to Wallet</button>
+  <button onclick="buyWoodcoin()">Buy Now</button>
+
+  <div class="message" id="statusMsg"></div>
+  <div class="warning" id="warningMsg" style="color:red;"></div>
+
+  <div id="progressSection">
+    <p id="bnbRaisedText">💰 Raised: -- / 100 BNB</p>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
     </div>
-    <div class="row">
-      <button id="btnConnect" class="btn primary">Connect Wallet</button>
-      <button id="btnDisconnect" class="btn danger" style="display:none">Disconnect</button>
-      <button id="btnAddToken" class="btn">+ Add WOOD to MetaMask</button>
-    </div>
-    <div class="row">
-      <div class="kpi"><span class="label">Status:</span><span id="status" class="val">–</span></div>
-      <div class="kpi"><span class="label">Opens in:</span><span id="opensIn" class="val">–</span></div>
-      <div class="kpi"><span class="label">Ends in:</span><span id="endsIn" class="val">–</span></div>
-    </div>
-    <div class="grid">
-      <div class="card">
-        <div class="section-title">Buy WOOD</div>
-        <div class="form-row">
-          <div>
-            <label class="small">Amount (BNB)</label>
-            <input type="number" id="bnbAmount" placeholder="0.01" min="0" step="0.001"/>
-          </div>
-          <div>
-            <label class="small">You get (WOOD)</label>
-            <input type="text" id="woodPreview" placeholder="0" readonly/>
-          </div>
-        </div>
-        <div class="row">
-          <button id="btnBuy" class="btn primary">Buy</button>
-          <button id="btnClaim" class="btn">Claim</button>
-        </div>
-        <div class="small" id="txMsg"></div>
+    <div class="note">Live balance from BSC Mainnet</div>
+    <p class="note">
+      Sale Contract:
+      <a href="https://bscscan.com/address/0x7cebc99b114138152D54589BaF6a386b5435f4d0" target="_blank">
+        0x7ceb...f4d0
+      </a>
+    </p>
+  </div>
+
+  <section style="margin-top: 40px;">
+    <h3 style="color: #f39c12; font-size: 20px;">🎮 WOODCOIN Games</h3>
+    <p style="font-size: 14px; line-height: 1.6; color: #fff;">
+    <b>WOODCOIN21</b> – A fast-paced blackjack-style game. Play for free or with real WOOD in multiplayer mode. Private rooms, strategy, and 🔥 rewards.<br><br>
+    <b>Don't Get Mad, WOOD!</b> – A web3 remake of the classic board game. Move your pawns, race to win, and collect WOOD with every game. 🎲
+    </p>
+  </section>
+
+  <section style="margin-top: 40px;">
+    <h3 style="color: #00ffff; font-size: 20px;">📅 WOODCOIN Roadmap</h3>
+    <ul style="font-size: 14px; text-align: left; max-width: 600px; margin: 0 auto; color: #fff;">
+      <li>✅ Presale V1–V2 (Testnet)</li>
+      <li>✅ Presale V3 (50,000 WOOD / BNB)</li>
+      <li>🔜 WOODCOIN21 – Web3 blackjack game</li>
+      <li>🔜 Don’t Get Mad, WOOD! – Multiplayer board game</li>
+      <li>🔒 WOOD listing on DEX (PancakeSwap or similar)</li>
+      <li>🔒 NFTs, tournaments, and ecosystem expansion</li>
+    </ul>
+  </section>
+
+  <script>
+    const saleAddress = "0x7cebc99b114138152D54589BaF6a386b5435f4d0";
+
+    if (typeof window.web3 === 'undefined') {
+      window.web3 = new Web3('https://bsc-dataseed.binance.org/');
+    }
+
+    async function connectWallet() {
+      if (typeof window.ethereum === 'undefined') {
+        document.getElementById('warningMsg').innerText = '❌ Wallet not detected.';
+        return;
+      }
+
+      window.web3 = new Web3(window.ethereum);
+
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0x38',
+            chainName: 'Binance Smart Chain',
+            rpcUrls: ['https://bsc-dataseed.binance.org/'],
+            nativeCurrency: {
+              name: 'BNB',
+              symbol: 'BNB',
+              decimals: 18
+            },
+            blockExplorerUrls: ['https://bscscan.com']
+          }]
+        });
+
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userWallet = accounts[0];
+        document.getElementById('walletAddress').innerText = 'Wallet: ' + userWallet;
+        updateProgress();
+      } catch (err) {
+        document.getElementById('statusMsg').innerText = '❌ Wallet connection failed.';
+      }
+    }
+
+    async function addToken() {
+      try {
+        const wasAdded = await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: '0x5c96991B2EB50924348eCcf3bBB97cDc0a83466E',
+              symbol: 'WOOD',
+              decimals: 18,
+            },
+          },
+        });
+
+        if (wasAdded) {
+          console.log('WOODCOIN added to wallet!');
+        }
+      } catch (error) {
+        console.error('Add token error:', error);
+      }
+    }
+
+    async function buyWoodcoin() {
+      if (!userWallet) {
+        alert("Please connect your wallet first.");
+        return;
+      }
+
+      const txn = {
+        from: userWallet,
+        to: saleAddress
+        // User will input amount in MetaMask
+      };
+
+      try {
+        const txHash = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [txn],
+        });
+
+        
+    document.getElementById('statusMsg').innerHTML = `
+      <div style='font-size:18px; color:#00ff99;'>
+        ✅ Transaction sent!<br>
+        🎉 You will receive your WOOD soon.<br>
+        <span style='font-size:13px;'>TX Hash: ${txHash}</span>
       </div>
-      <div class="card">
-        <div class="section-title">Information</div>
-        <div class="info">
-          <div class="rowi"><span class="small">Sale Contract:</span>
-            <span id="saleAddr" class="copy"></span>
-          </div>
-          <div class="rowi"><span class="small">Token (WOOD):</span>
-            <span id="tokenAddr" class="copy"></span>
-          </div>
-          <div class="rowi"><span class="small">Rate:</span>
-            <span id="rateTxt" class="val">–</span><span class="small">&nbsp;WOOD / 1 BNB</span>
-          </div>
-          <div class="rowi"><span class="small">Raised:</span>
-            <span id="raisedTxt" class="val">–</span><span class="small">&nbsp;/ 100 BNB</span>
-          </div>
-          <div class="progress"><span id="bar" style="width:0%"></span></div>
-          <div class="rowi"><span class="small">Your allocation (unclaimed):</span>
-            <span id="unclaimed" class="val">– WOOD</span>
-          </div>
-        </div>
+    `;
+    
+        updateProgress();
+      } catch (err) {
+        document.getElementById('statusMsg').innerText = '❌ Transaction failed or cancelled.';
+      }
+    }
+
+    async function updateProgress() {
+      try {
+        const balanceWei = await window.web3.eth.getBalance(saleAddress);
+        const balanceBNB = window.web3.utils.fromWei(balanceWei, 'ether');
+        const raised = parseFloat(balanceBNB);
+        const percent = Math.min((raised / 100) * 100, 100);
+        document.getElementById('bnbRaisedText').innerText = `💰 Raised: ${raised.toFixed(3)} / 100 BNB`;
+        document.getElementById('progressBar').style.width = percent + "%";
+      } catch (err) {
+        console.error("Error fetching balance:", err);
+      }
+    }
+
+    
+let endTime;
+const storedTime = localStorage.getItem("woodcoinCountdown");
+
+if (storedTime && parseInt(storedTime) > Date.now()) {
+  endTime = parseInt(storedTime);
+} else {
+  endTime = Date.now() + (14 * 24 * 60 * 60 * 1000);
+  localStorage.setItem("woodcoinCountdown", endTime.toString());
+}
+
+    const timerEl = document.getElementById('countdown');
+    setInterval(() => {
+      const now = new Date().getTime();
+      const diff = endTime - now;
+      if (diff <= 0) {
+        timerEl.innerText = "⛔ Tier 1 has ended. Tier 2 coming soon!";
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      timerEl.innerText = `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s left until price increase (+7%)`;
+    }, 1000);
+
+    window.addEventListener("load", updateProgress);
+  </script>
+
+  <div style="margin-top:60px; font-size:13px; color:gray;">
+    <a href="#" onclick="document.getElementById('termsModal').style.display='flex'; return false;" style="color:#ccc;">Terms & Conditions</a>
+  </div>
+
+  <div id="termsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.95); color:white; display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <div style="max-width:90%; background:#111; padding:20px 25px; border-radius:10px; text-align:left;">
+      <h2 style="text-align:center;">Terms & Conditions</h2>
+      <p style="font-size:14px; line-height:1.6;">
+        WOODCOIN is a utility token used within the WOOD ecosystem.<br><br>
+        It does not represent ownership, investment, or any form of profit guarantee.<br><br>
+        By participating in this pre-sale, you accept the risks of interacting with Web3 tokens, and understand that all transactions are final.<br><br>
+        Always do your own research (DYOR) and never invest more than you can afford to lose. 🔥
+      </p>
+      <div style="text-align:center;">
+        <button onclick="document.getElementById('termsModal').style.display='none';" style="margin-top:20px; padding:10px 20px; font-size:16px;">Close</button>
       </div>
     </div>
   </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-<script>
-// Config + logic la fel ca în varianta explicată anterior
-</script>
+
 </body>
+
 </html>
