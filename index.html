@@ -227,7 +227,7 @@ try {
 
   <br/>
   <button onclick="addToken()">Add WOODCOIN to Wallet</button>
-  <button id="buy-btn" onclick="buyWoodcoin()" style="background:#555;color:#999;cursor:not-allowed;">Buy Now</button>
+  <button type="button" id="buy-btn" onclick="buyWoodcoin()" style="background:#555;color:#999;cursor:not-allowed;">Buy Now</button>
 <br>
 <input type="number" id="bnbAmount" placeholder="Enter BNB amount" 
 style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 8px; width: 80%; max-width: 300px;">
@@ -738,6 +738,32 @@ window.addEventListener('load', updateWalletStatus);
   });
   // Periodic safety check in case DOM re-renders
   setInterval(refresh, 2000);
+})();
+</script>
+
+<script>
+(function(){
+  function bindBuyClick(){
+    if(window._wc_buy_click_bound) return;
+    var btn = document.getElementById('buy-btn') || document.querySelector('button[onclick="buyWoodcoin()"]');
+    if(!btn) return;
+    btn.addEventListener('click', function(ev){
+      try{
+        ev.preventDefault(); ev.stopPropagation();
+      }catch(e){}
+      if(typeof buyWoodcoin === 'function'){
+        console.log('[WOODCOIN] Buy button clicked');
+        buyWoodcoin();
+      }else{
+        alert('Action not ready. Please reload the page.');
+        console.warn('[WOODCOIN] buyWoodcoin() not found');
+      }
+    }, { passive:false });
+    window._wc_buy_click_bound = true;
+  }
+  document.addEventListener('DOMContentLoaded', bindBuyClick);
+  // Safety rebind if DOM changes
+  setInterval(bindBuyClick, 1500);
 })();
 </script>
 </body>
