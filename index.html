@@ -578,7 +578,7 @@ async function buyTokens() {
 async function updateWalletStatus() {
   if (typeof window.ethereum !== 'undefined') {
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       if (accounts.length > 0) {
         const walletAddress = accounts[0];
         document.getElementById("wallet-address").innerText = "Wallet: " + walletAddress;
@@ -612,7 +612,7 @@ window.addEventListener('load', updateWalletStatus);
     async function checkAccounts(){
       try{
         if(window.ethereum && window.ethereum.request){
-          var accs = await window.ethereum.request({ method: 'eth_accounts' });
+          var accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
           if(accs && accs.length > 0){
             showBadge(accs[0]);
           } else {
@@ -641,7 +641,7 @@ window.addEventListener('load', updateWalletStatus);
           var res = await _origReq(args);
           try{
             if(args && args.method === 'eth_requestAccounts'){
-              var accs = Array.isArray(res) ? res : (await _origReq({method:'eth_accounts'}));
+              var accs = Array.isArray(res) ? res : (await _origReq({method:'eth_requestAccounts'}));
               if(accs && accs.length > 0){ showBadge(accs[0]); }
             }
           }catch(e){}
@@ -743,7 +743,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       try {
         const accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_accounts' });
+await ethereum.request({ method: 'eth_requestAccounts' });
         if(!accounts || accounts.length === 0){
           alert("Please connect your wallet first.");
           return;
@@ -799,7 +799,7 @@ document.addEventListener("DOMContentLoaded", function() {
       try {
         // Check connection
         let accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_accounts' });
+await ethereum.request({ method: 'eth_requestAccounts' });
         if(!accounts || accounts.length === 0){
           // Prompt connect, then re-check
           accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
@@ -875,7 +875,7 @@ await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
   async function ensureConnected(){
     if(!(window.ethereum && window.ethereum.request)) return null;
     let accs = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_accounts' });
+await ethereum.request({ method: 'eth_requestAccounts' });
     if(!accs || accs.length === 0){
       try{ accs = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
 await ethereum.request({ method: 'eth_requestAccounts' }); }
@@ -891,6 +891,23 @@ await ethereum.request({ method: 'eth_requestAccounts' }); }
 
   // Patch the global buyWoodcoin used by the existing button
   window.buyWoodcoin = async function(){
+  // --- Ensure wallet connected (request accounts) ---
+  let _wc_from = null;
+  try {
+    const _wc_accs = await ethereum.request({ method: 'eth_requestAccounts' });
+    _wc_from = (_wc_accs && _wc_accs[0]) ? _wc_accs[0] : null;
+  } catch(e) {
+    // ignore
+  }
+  if(!_wc_from && window.ethereum && window.ethereum.selectedAddress){
+    _wc_from = window.ethereum.selectedAddress;
+  }
+  if(!_wc_from){
+    alert("Please connect your wallet first.");
+    return;
+  }
+  console.log("[WOODCOIN] Connected account:", _wc_from);
+
     const input = document.getElementById("bnbAmount");
     const amount = input ? parseFloat(input.value) : NaN;
 
@@ -967,7 +984,7 @@ await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
       return null;
     }
     let accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_accounts' });
+await ethereum.request({ method: 'eth_requestAccounts' });
     if(!accounts || accounts.length === 0){
       try { accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
 await ethereum.request({ method: 'eth_requestAccounts' }); }
