@@ -474,6 +474,54 @@ async function buyTokens() {
 }
 </script>
 
+
+<script>
+  async function connectWallet() {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        document.getElementById("wallet-status").textContent = "✅ Wallet connected";
+      } catch (error) {
+        alert("Wallet connection failed.");
+      }
+    } else {
+      alert("MetaMask not detected! Please open this page in MetaMask, Trust Wallet, BestWallet or TokenPocket.");
+      window.location.href = "https://metamask.app.link/dapp/woodcoin-presale.vercel.app";
+    }
+  }
+
+  async function addToken() {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        await window.ethereum.request({
+          method: "wallet_watchAsset",
+          params: {
+            type: "ERC20",
+            options: {
+              address: "0x5c96991B2EB50924348eCcf3bBB97cDc0a83466E",
+              symbol: "WOOD",
+              decimals: 18,
+              image: "https://woodcoin.vercel.app/wood-logo.png"
+            },
+          },
+        });
+      } catch (error) {
+        alert("Could not add token.");
+      }
+    } else {
+      alert("Please use MetaMask or supported Web3 wallet.");
+    }
+  }
+
+  window.onload = function () {
+    const connectBtn = document.getElementById("connect-wallet");
+    const addBtn = document.getElementById("add-woodcoin");
+
+    if (connectBtn) connectBtn.onclick = connectWallet;
+    if (addBtn) addBtn.onclick = addToken;
+  };
+</script>
+
 </body>
 
 </html>
