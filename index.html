@@ -227,7 +227,7 @@ try {
 
   <br/>
   <button onclick="addToken()">Add WOODCOIN to Wallet</button>
-  <button onclick="buyWoodcoin()" disabled style="background:#555;color:#999;cursor:not-allowed;">Buy Now</button>
+  <button id="buy-btn" onclick="buyWoodcoin()" style="background:#555;color:#999;cursor:not-allowed;">Buy Now</button>
 <br>
 <input type="number" id="bnbAmount" placeholder="Enter BNB amount" 
 style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 8px; width: 80%; max-width: 300px;">
@@ -698,6 +698,46 @@ window.addEventListener('load', updateWalletStatus);
       refresh();
     }
   });
+})();
+</script>
+
+<script>
+(function(){
+  function getBuyBtn(){
+    return document.getElementById('buy-btn') || document.querySelector('button[onclick="buyWoodcoin()"]') || Array.from(document.querySelectorAll('button')).find(b => /buy now/i.test(b.textContent || ''));
+  }
+  function getAmountInput(){
+    return document.getElementById('bnbAmount') || document.querySelector('input[type="number"]#bnbAmount') || document.querySelector('input[type="number"]');
+  }
+  function setEnabled(enabled){
+    var btn = getBuyBtn();
+    if(!btn) return;
+    btn.disabled = !enabled;
+    if(enabled){
+      btn.style.background = "#f0b90b";
+      btn.style.color = "#111";
+      btn.style.cursor = "pointer";
+    }else{
+      btn.style.background = "#555";
+      btn.style.color = "#999";
+      btn.style.cursor = "not-allowed";
+    }
+  }
+  function refresh(){
+    var input = getAmountInput();
+    var val = input ? parseFloat(input.value) : NaN;
+    setEnabled(!isNaN(val) && val > 0);
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var input = getAmountInput();
+    if(input){
+      input.addEventListener('input', refresh);
+      input.addEventListener('change', refresh);
+    }
+    refresh();
+  });
+  // Periodic safety check in case DOM re-renders
+  setInterval(refresh, 2000);
 })();
 </script>
 </body>
