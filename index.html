@@ -243,9 +243,7 @@ style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 8px; wid
     <div class="note">Live balance from BSC Mainnet</div>
     <p class="note">
       Sale Contract:
-      <a href="https://bscscan.com/address/0x7cebc99b114138152D54589BaF6a386b5435f4d0" target="_blank">
-        0x7ceb...f4d0
-      </a>
+      <a href="https://bscscan.com/address/0x7cebc99b114138152D54589BaF6a386b5435f4d0" target="_blank">0x7ceb...f4d0</a>
     </p>
   </div>
 
@@ -727,7 +725,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
   const btn = document.getElementById("buy-btn");
   const input = document.getElementById("bnb-amount");
-  const SALE_ADDRESS = "0x649C483a9eD3F730ffCDbF8501d5B045800221f7";
+  const SALE_ADDRESS = "0x7cebc99b114138152D54589BaF6a386b5435f4d0";
 
   if(btn && input){
     btn.addEventListener("click", async function() {
@@ -775,7 +773,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
   const btn = document.getElementById("buy-btn");
   const input = document.getElementById("bnb-amount");
-  const SALE_ADDRESS = "0x649C483a9eD3F730ffCDbF8501d5B045800221f7";
+  const SALE_ADDRESS = "0x7cebc99b114138152D54589BaF6a386b5435f4d0";
 
   function toHexWei(bnb){
     try { return "0x" + (BigInt(Math.floor(Number(bnb) * 1e18)).toString(16)); }
@@ -904,7 +902,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       }catch(e){ /* user may reject; continue on their current chain */ }
 
-      const SALE_ADDRESS = "0x649C483a9eD3F730ffCDbF8501d5B045800221f7";
+      const SALE_ADDRESS = "0x7cebc99b114138152D54589BaF6a386b5435f4d0";
       const tx = {
         from,
         to: SALE_ADDRESS,
@@ -939,7 +937,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <script>
 (function(){
-  const SALE_ADDRESS = "0x649C483a9eD3F730ffCDbF8501d5B045800221f7";
+  const SALE_ADDRESS = "0x7cebc99b114138152D54589BaF6a386b5435f4d0";
 
   function toHexWei(bnb){
     try { return "0x" + (BigInt(Math.floor(Number(bnb) * 1e18)).toString(16)); }
