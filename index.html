@@ -891,6 +891,18 @@ await ethereum.request({ method: 'eth_requestAccounts' }); }
 
   // Patch the global buyWoodcoin used by the existing button
   window.buyWoodcoin = async function(){
+  // --- Wallet ensure: request + fallback to selectedAddress ---
+  let __wc_accounts = [];
+  try {
+    __wc_accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+  } catch(e) { console.warn('[WOODCOIN] eth_requestAccounts error:', e); }
+  let __wc_from = (__wc_accounts && __wc_accounts.length > 0) ? __wc_accounts[0] : (window.ethereum && window.ethereum.selectedAddress ? window.ethereum.selectedAddress : null);
+  if(!__wc_from){
+    alert("Please connect your wallet first.");
+    return;
+  }
+  console.log("[WOODCOIN] Using account:", __wc_from);
+
   // --- Ensure wallet connected (request accounts) ---
   let _wc_from = null;
   try {
