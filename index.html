@@ -53,6 +53,30 @@
       color: #ccc;
     }
   </style>
+
+<script>
+async function connectWallet() {
+    if (typeof window.ethereum !== 'undefined') {
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            document.getElementById("walletStatus").innerText = "Wallet: " + accounts[0];
+        } catch (error) {
+            alert("Connection failed: " + error.message);
+        }
+    } else {
+        // Redirect to wallet download page (e.g. MetaMask or BestWallet)
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        if (/android/i.test(userAgent)) {
+            window.location.href = "https://play.google.com/store/apps/details?id=io.metamask";
+        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            window.location.href = "https://apps.apple.com/app/metamask/id1438144202";
+        } else {
+            window.location.href = "https://metamask.io/download/";
+        }
+    }
+}
+</script>
+
 </head>
 <body>
   <h1>🔥 WOODCOIN Pre-Sale</h1>
@@ -180,11 +204,21 @@ try {
     </script>
     
 
-  <div class="wallet-status" id="walletAddress">Wallet: Not connected</div>
+  <div class="wallet-status" id="walletAddress">Wallet: Not connected<br><span id="wallet-address" style="color:#00ff00;"></span></div>
   <button onclick="connectWallet()">Connect Wallet</button>
+<div style="margin-top: 10px;">
+  <a href="https://metamask.io/download/" target="_blank">
+    <button style="background: orange; color: black; font-weight: bold;">🔽 Download MetaMask</button>
+  </a>
+</div>
+
   <br/>
   <button onclick="addToken()">Add WOODCOIN to Wallet</button>
   <button onclick="buyWoodcoin()">Buy Now</button>
+<br>
+<input type="number" id="bnbAmount" placeholder="Enter BNB amount" 
+style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 8px; width: 80%; max-width: 300px;">
+
 
   <div class="message" id="statusMsg"></div>
   <div class="warning" id="warningMsg" style="color:red;"></div>
@@ -521,6 +555,8 @@ async function buyTokens() {
     if (addBtn) addBtn.onclick = addToken;
   };
 </script>
+
+
 
 </body>
 
