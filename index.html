@@ -243,7 +243,9 @@ style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 8px; wid
     <div class="note">Live balance from BSC Mainnet</div>
     <p class="note">
       Sale Contract:
-      <a href="https://bscscan.com/address/0x7cebc99b114138152D54589BaF6a386b5435f4d0" target="_blank">0x7ceb...f4d0</a>
+      <a href="https://bscscan.com/address/0x7cebc99b114138152D54589BaF6a386b5435f4d0" target="_blank">
+        0x7ceb...f4d0
+      </a>
     </p>
   </div>
 
@@ -444,18 +446,15 @@ async function connectWallet() {
     return;
   }
 
-  const chainId = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_chainId' });
+  const chainId = await ethereum.request({ method: 'eth_chainId' });
   if (chainId !== '0x38') {
     try {
-      console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({
+      await ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: '0x38' }]
       });
     } catch (switchErr) {
-      console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({
+      await ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [{
           chainId: '0x38',
@@ -468,8 +467,7 @@ await ethereum.request({
     }
   }
 
-  const accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_requestAccounts' });
+  const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
   userAddress = accounts[0];
   document.getElementById('walletAddress').innerText = 'Wallet: ' + userAddress;
 }
@@ -477,8 +475,7 @@ await ethereum.request({ method: 'eth_requestAccounts' });
 async function addToken() {
   if (!window.ethereum) return;
   try {
-    console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({
+    await ethereum.request({
       method: 'wallet_watchAsset',
       params: {
         type: 'ERC20',
@@ -578,7 +575,7 @@ async function buyTokens() {
 async function updateWalletStatus() {
   if (typeof window.ethereum !== 'undefined') {
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
       if (accounts.length > 0) {
         const walletAddress = accounts[0];
         document.getElementById("wallet-address").innerText = "Wallet: " + walletAddress;
@@ -612,7 +609,7 @@ window.addEventListener('load', updateWalletStatus);
     async function checkAccounts(){
       try{
         if(window.ethereum && window.ethereum.request){
-          var accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          var accs = await window.ethereum.request({ method: 'eth_accounts' });
           if(accs && accs.length > 0){
             showBadge(accs[0]);
           } else {
@@ -641,7 +638,7 @@ window.addEventListener('load', updateWalletStatus);
           var res = await _origReq(args);
           try{
             if(args && args.method === 'eth_requestAccounts'){
-              var accs = Array.isArray(res) ? res : (await _origReq({method:'eth_requestAccounts'}));
+              var accs = Array.isArray(res) ? res : (await _origReq({method:'eth_accounts'}));
               if(accs && accs.length > 0){ showBadge(accs[0]); }
             }
           }catch(e){}
@@ -742,8 +739,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
 
       try {
-        const accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await ethereum.request({ method: 'eth_accounts' });
         if(!accounts || accounts.length === 0){
           alert("Please connect your wallet first.");
           return;
@@ -760,8 +756,7 @@ await ethereum.request({ method: 'eth_requestAccounts' });
           value: "0x" + (BigInt(Math.floor(val * 1e18)).toString(16))
         };
 
-        const txHash = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({
+        const txHash = await ethereum.request({
           method: 'eth_sendTransaction',
           params: [tx]
         });
@@ -798,12 +793,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
       try {
         // Check connection
-        let accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_requestAccounts' });
+        let accounts = await ethereum.request({ method: 'eth_accounts' });
         if(!accounts || accounts.length === 0){
           // Prompt connect, then re-check
-          accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_requestAccounts' }).catch(() => []);
+          accounts = await ethereum.request({ method: 'eth_requestAccounts' }).catch(() => []);
           if(!accounts || accounts.length === 0){
             alert("Please connect your wallet first.");
             return;
@@ -818,14 +811,12 @@ await ethereum.request({ method: 'eth_requestAccounts' }).catch(() => []);
 
         // Optionally warn if not on BSC (chainId 0x38)
         try{
-          const chainId = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_chainId' });
+          const chainId = await ethereum.request({ method: 'eth_chainId' });
           if(chainId !== '0x38'){
             const go = confirm("You are not on BNB Smart Chain. Switch now?");
             if(go){
               try{
-                console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+                await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
               }catch(eSwitch){ /* user might reject; continue or abort */ }
             }
           }
@@ -843,8 +834,7 @@ await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainI
           value: weiHex
         };
 
-        const txHash = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
+        const txHash = await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
         alert("Transaction sent! TX Hash: " + txHash);
       } catch (err) {
         console.error(err);
@@ -874,11 +864,9 @@ await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
 
   async function ensureConnected(){
     if(!(window.ethereum && window.ethereum.request)) return null;
-    let accs = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_requestAccounts' });
+    let accs = await ethereum.request({ method: 'eth_accounts' });
     if(!accs || accs.length === 0){
-      try{ accs = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_requestAccounts' }); }
+      try{ accs = await ethereum.request({ method: 'eth_requestAccounts' }); }
       catch(e){ return null; }
     }
     return (accs && accs[0]) ? accs[0] : null;
@@ -891,35 +879,6 @@ await ethereum.request({ method: 'eth_requestAccounts' }); }
 
   // Patch the global buyWoodcoin used by the existing button
   window.buyWoodcoin = async function(){
-  // --- Wallet ensure: request + fallback to selectedAddress ---
-  let __wc_accounts = [];
-  try {
-    __wc_accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-  } catch(e) { console.warn('[WOODCOIN] eth_requestAccounts error:', e); }
-  let __wc_from = (__wc_accounts && __wc_accounts.length > 0) ? __wc_accounts[0] : (window.ethereum && window.ethereum.selectedAddress ? window.ethereum.selectedAddress : null);
-  if(!__wc_from){
-    alert("Please connect your wallet first.");
-    return;
-  }
-  console.log("[WOODCOIN] Using account:", __wc_from);
-
-  // --- Ensure wallet connected (request accounts) ---
-  let _wc_from = null;
-  try {
-    const _wc_accs = await ethereum.request({ method: 'eth_requestAccounts' });
-    _wc_from = (_wc_accs && _wc_accs[0]) ? _wc_accs[0] : null;
-  } catch(e) {
-    // ignore
-  }
-  if(!_wc_from && window.ethereum && window.ethereum.selectedAddress){
-    _wc_from = window.ethereum.selectedAddress;
-  }
-  if(!_wc_from){
-    alert("Please connect your wallet first.");
-    return;
-  }
-  console.log("[WOODCOIN] Connected account:", _wc_from);
-
     const input = document.getElementById("bnbAmount");
     const amount = input ? parseFloat(input.value) : NaN;
 
@@ -939,11 +898,9 @@ await ethereum.request({ method: 'eth_requestAccounts' }); }
     try{
       // Optional: switch to BSC
       try{
-        const chainId = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_chainId' });
+        const chainId = await ethereum.request({ method: 'eth_chainId' });
         if(chainId !== '0x38'){
-          console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+          await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
         }
       }catch(e){ /* user may reject; continue on their current chain */ }
 
@@ -953,8 +910,7 @@ await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainI
         to: SALE_ADDRESS,
         value: toHexWei(amount)
       };
-      const txHash = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
+      const txHash = await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
       alert("Transaction sent! TX Hash: " + txHash);
     }catch(err){
       console.error(err);
@@ -995,11 +951,9 @@ await ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
       alert("Please install MetaMask or a compatible wallet.");
       return null;
     }
-    let accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_requestAccounts' });
+    let accounts = await ethereum.request({ method: 'eth_accounts' });
     if(!accounts || accounts.length === 0){
-      try { accounts = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_requestAccounts' }); }
+      try { accounts = await ethereum.request({ method: 'eth_requestAccounts' }); }
       catch(e){ accounts = []; }
     }
     if(!accounts || accounts.length === 0){
@@ -1024,13 +978,11 @@ await ethereum.request({ method: 'eth_requestAccounts' }); }
 
     // Optional: try switching to BSC mainnet
     try{
-      const chainId = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'eth_chainId' });
+      const chainId = await ethereum.request({ method: 'eth_chainId' });
       if(chainId !== '0x38'){
         const go = confirm("You are not on BNB Smart Chain. Switch now?");
         if(go){
-          try{ console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] }); }catch(e){}
+          try{ await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] }); }catch(e){}
         }
       }
     }catch(e){}
@@ -1039,8 +991,7 @@ await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainI
     if(!weiHex){ alert("Invalid amount."); return; }
 
     try{
-      const txHash = console.log("[WOODCOIN] Sending TX to", SALE_ADDRESS);
-await ethereum.request({
+      const txHash = await ethereum.request({
         method: 'eth_sendTransaction',
         params: [ { from, to: SALE_ADDRESS, value: weiHex } ]
       });
