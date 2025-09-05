@@ -879,6 +879,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Patch the global buyWoodcoin used by the existing button
   window.buyWoodcoin = async function(){
+
+  // --- Ensure BSC Mainnet (0x38) ---
+  try {
+    const _cid = await (window.ethereum ? window.ethereum.request({ method: 'eth_chainId' }) : Promise.resolve(null));
+    console.log('[WOODCOIN] Current chainId:', _cid);
+    if (_cid !== '0x38') {
+      try {
+        await ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+        console.log('[WOODCOIN] Switched to BSC Mainnet (0x38)');
+      } catch (eSwitch) {
+        alert('Please switch to BNB Smart Chain (Mainnet) to continue.');
+        return;
+      }
+    }
+  } catch (e) { console.warn('Chain check error', e); }
+
     const input = document.getElementById("bnbAmount");
     const amount = input ? parseFloat(input.value) : NaN;
 
