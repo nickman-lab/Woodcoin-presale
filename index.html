@@ -92,6 +92,89 @@ async function connectWallet() {
 
 
   <h1>🔥 WOODCOIN Pre-Sale</h1>
+
+  <style>
+    .inline-warning {
+      display: none;
+      margin: 16px auto 0;
+      max-width: 720px;
+      background: #fff3cd;
+      color: #333;
+      border: 1px solid #ffeeba;
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    .inline-warning button {
+      margin-top: 8px;
+      padding: 8px 14px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .inline-warning .hint {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #6c757d;
+      display:none;
+    }
+  </style>
+  <div id="browser-warning" class="inline-warning">
+    ⚠️ Please open this page in <b>Google Chrome</b> with <b>MetaMask</b> installed.
+    <br/>
+    <button id="open-chrome-btn">Open in Chrome</button>
+    <div class="hint" id="open-hint">If nothing happens, open Chrome and paste the link.</div>
+  </div>
+  <script>
+    function openInChromeSmartFixed() {
+      const u = new URL(window.location.href);
+      const proto = u.protocol.replace(':','');
+      const host = u.host;
+      const path = u.pathname + (u.search || '') + (u.hash || '');
+      const ua = navigator.userAgent;
+      const isiOS = /iPad|iPhone|iPod/.test(ua);
+      const isAndroid = /Android/.test(ua);
+      const hint = document.getElementById('open-hint');
+      if (hint) hint.style.display = 'block';
+      if (isiOS) {
+        const scheme = (proto === 'https') ? 'googlechromes://' : 'googlechrome://';
+        window.location.href = scheme + host + path;
+      } else if (isAndroid) {
+        const intent = "intent://" + host + path + "#Intent;scheme=" + proto + ";package=com.android.chrome;end";
+        window.location.href = intent;
+        setTimeout(function(){ try { window.open(u.href, "_blank"); } catch(e){} }, 800);
+      } else {
+        try { window.open(u.href, "_blank"); } catch(e){}
+      }
+    }
+    window.addEventListener('load', function() {
+      const ua = navigator.userAgent;
+      const isChrome = /Chrome\/[0-9]/.test(ua) && !/Edg\//.test(ua) && !/OPR\//.test(ua);
+      const isCriOS = /CriOS\//.test(ua);
+      const isBrave = /Brave\//.test(ua) || (navigator.brave && navigator.brave.isBrave);
+      const isMetaMaskBrowser = /MetaMaskMobile/.test(ua);
+      const hasMetaMask = !!(window.ethereum && window.ethereum.isMetaMask);
+      const goodBrowser = isChrome || isCriOS || isBrave || isMetaMaskBrowser;
+      const warn = document.getElementById('browser-warning');
+      const btn = document.getElementById('open-chrome-btn');
+      if (btn) btn.onclick = openInChromeSmartFixed;
+      if (!goodBrowser || !hasMetaMask) {
+        if (warn) warn.style.display = 'block';
+      }
+    });
+  </script>
+
+  <div class="raised-wrap" style="margin:30px auto 0; max-width:800px;">
+    <div id="raised-display" style="font-size:20px;">Raised: 8,300 BNB</div>
+    <div class="progress-container" style="margin:10px auto 0; width:80%; background:#333; border-radius:10px; height:20px; overflow:hidden;">
+      <div id="raised-bar" class="progress-bar" style="height:100%; width:83%; background:#f1c40f;"></div>
+    </div>
+    <div id="goal-display" style="font-size:14px; color:#ccc; margin-top:6px;">Goal: 10,000 BNB</div>
+  </div>
+
   <p style="margin-top: 10px; color: #ffd700; font-size: 16px;">
     WOODCOIN is a Play-to-Earn token that fuels the WOOD ecosystem.<br>
     Earn it. Use it. Burn it. 🔥
@@ -235,13 +318,7 @@ style="margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 8px; wid
   <div class="message" id="statusMsg"></div>
   <div class="warning" id="warningMsg" style="color:red;"></div>
 
-  <div id="progressSection">
-    <p id="bnbRaisedText">💰 Raised: -- / 100 BNB</p>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-    <div class="note">Live balance from BSC Mainnet</div>
-    <p class="note">
+  <p class="note">
       Sale Contract:
       <a href="https://bscscan.com/address/0x7cebc99b114138152D54589BaF6a386b5435f4d0" target="_blank">
         0x7ceb...f4d0
